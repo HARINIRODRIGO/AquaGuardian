@@ -92,7 +92,7 @@ def bbox_conf(bboxes, confs, pos):
   Returns:
       A tuple containing the bounding box and confidence score at the specified position.
   """
-    bbox  = bboxes[pos]
+    bbox = bboxes[pos]
     conf = confs[pos]
     return bbox, conf
 
@@ -299,8 +299,8 @@ def vote(predictions_rtmdet, predictions_yolo):
   rtmdet_classes = list(rtmdet_classes)
   # Check if the class lists from both models are identical and sorted
   if len(rtmdet_classes)==len(yolo_classes):
-      nonsorted_yolo_classes =  yolo_classes
-      nonsorted_rtmdet_classes =  rtmdet_classes
+      nonsorted_yolo_classes = yolo_classes
+      nonsorted_rtmdet_classes = rtmdet_classes
       rtmdet_classes.sort()
       yolo_classes.sort()
       if yolo_classes == rtmdet_classes:
@@ -317,7 +317,7 @@ def vote(predictions_rtmdet, predictions_yolo):
                                       nonsorted_yolo_classes=nonsorted_yolo_classes, class_=com_rtmdet_class_)
 
                # for non common values checking confidence. If confident score greater than 0.8 then accept it as a correct answer 
-                uniq_yolo_classes =  [x for x in nonsorted_yolo_classes if x not in nonsorted_rtmdet_classes]
+                uniq_yolo_classes = [x for x in nonsorted_yolo_classes if x not in nonsorted_rtmdet_classes]
                 uniq_rtmdet_classes = [x for x in nonsorted_rtmdet_classes if x not in nonsorted_yolo_classes]
                 confChecker(classes=uniq_rtmdet_classes, min_conf=0.8, confs=rtmdet_confs, bbox=rtmdet_bboxes)
                 confChecker(classes=uniq_yolo_classes, min_conf=0.8, confs=yolo_confs, bbox=yolo_bboxes)
@@ -326,8 +326,8 @@ def vote(predictions_rtmdet, predictions_yolo):
                                nonsorted_rtmdet_classes=nonsorted_rtmdet_classes, 
                    nonsorted_yolo_classes=nonsorted_yolo_classes, yolo_classes=yolo_classes, rtmdet_classes=rtmdet_classes)
   else:
-        nonsorted_yolo_classes =  yolo_classes
-        nonsorted_rtmdet_classes =  rtmdet_classes
+        nonsorted_yolo_classes = yolo_classes
+        nonsorted_rtmdet_classes = rtmdet_classes
         diffSizeArrays(rtmdet_bboxes=rtmdet_bboxes, rtmdet_confs=rtmdet_confs, yolo_bboxes=yolo_bboxes, yolo_confs=yolo_confs, 
                                nonsorted_rtmdet_classes=nonsorted_rtmdet_classes, 
                    nonsorted_yolo_classes=nonsorted_yolo_classes, yolo_classes=yolo_classes, rtmdet_classes=rtmdet_classes)
