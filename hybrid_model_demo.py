@@ -1,8 +1,10 @@
+import sys
 import tkinter as tk
+from tkinter import filedialog
 from PIL import Image, ImageTk
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from image_hybrid_model import *
-
+import concurrent.futures
 
 # Function to run hybrid model and display result
 def run_hybrid_model(image_path):
@@ -55,35 +57,60 @@ def imageUploader():
 	else:
 		print("No file is Choosen !! Please choose a file.")
 
+# Function to handle video uploading
+def videoUploader():
+    file_types = [("Video files", "*.mp4;*.avi;*.mov")]
+    path = filedialog.askopenfilename(filetypes=file_types)
+
+    if path:  # If a file is selected
+        loading_label = tk.Label(app, text="Loading....", fg="blue", bg="#CDF5FD", font=("Arial", 16, "bold"))
+        loading_label.place(x=250, y=300)  # Adjust the position as needed
+        
+        app.update()  # Update the GUI to immediately display the loading label
+
+        frame = Image.fromarray(frame)
+        frame = frame.resize((512, 512))
+        photo = ImageTk.PhotoImage(frame)
+
+        # Display the first frame
+        label.config(image=photo)
+        label.image = photo
+
+        loading_label.destroy()
+
+    else:  # If no file is selected
+        print("No file is chosen! Please choose a video file.")
+
 # Close the application properly
 def closeApp():
-	app.destroy()
-	
+    app.destroy()
+    sys.exit()
+    
 # Main method
 if __name__ == "__main__":
+    # Defining tkinter object
+    app = tk.Tk()
 
-	# defining tkinter object
-	app = tk.Tk()
+    # Setting title and basic size to our App
+    app.title("AquareGuardian")
+    app.geometry("640x640")
 
-	# setting title and basic size to our App
-	app.title("AquareGuardian")
-	app.geometry("640x640")
-	
+    # Adding background color to our widgets
+    app.option_add("*Label*Background", "#CDF5FD")
+    app.option_add("*Button*Background", "lightblue")
+    app['background']='#CDF5FD'
 
-	# adding background color to our upload button
-	app.option_add("*Label*Background", "#CDF5FD")
-	app.option_add("*Button*Background", "lightblue")
-	app['background']='#CDF5FD'
+    label = tk.Label(app, bd=5)
+    label.pack(pady=10)
 
-	label = tk.Label(app, bd=5)
-	label.pack(pady=10)
-	# defining our upload button
-	uploadButton = tk.Button(app, text="Locate Image", command=imageUploader,pady = 6, fg = "blue",bg= "#86B6F6",activeforeground = "blue",activebackground = "#86B6F6"
-						  , font=("Arial", 13))
-	uploadButton.place(x=150, y=560)
-	# Close button event handler
-	exit_button = tk.Button(app, text='Exit', command=closeApp,fg = "red",bg= "pink",activeforeground = "red",activebackground = "pink",pady = 6, padx=30 , font=("Arial", 13))
-	exit_button.place(x=320, y=560)
+    # Defining the image upload button
+    image_upload_button = tk.Button(app, text="Locate Image", command=imageUploader, pady=6, fg="blue", bg="#86B6F6", 
+                                    activeforeground="blue", activebackground="#86B6F6", font=("Arial", 13))
+    image_upload_button.place(x=150, y=560)
 
-	app.mainloop()
+    # Close button event handler
+    exit_button = tk.Button(app, text='Exit', command=closeApp, fg="red", bg="pink", activeforeground="red", 
+                            activebackground="pink", pady=6, padx=30, font=("Arial", 13))
+    exit_button.place(x=410, y=560)
 
+    app.mainloop()
