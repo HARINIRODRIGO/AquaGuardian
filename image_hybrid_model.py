@@ -1,3 +1,4 @@
+import datetime
 import cv2
 import torch
 from mmdet.apis import init_detector, inference_detector
@@ -7,7 +8,7 @@ from ultralytics import YOLO
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from threading import Thread
-import concurrent.futures
+
 ultralytics.checks()
 
 # Define device for model loading (cuda if available, cpu otherwise)
@@ -18,7 +19,7 @@ FILE_PATH = "Models"
 CONFIG_PATH = f"{FILE_PATH}/custom_30.py"
 WEIGHTS_PATH = f"{FILE_PATH}/epoch_30.pth"
 YOLO_MODEL_PATH = f"{FILE_PATH}/best-35.pt"
-dataset_location = "AquaGuardian-V1-1_test_img"
+dataset_location = "AquaGuardian-V1-1"
 
 # Load the RTMDet model using mmdet
 model_rtmdet = init_detector(CONFIG_PATH, WEIGHTS_PATH, device=DEVICE)
@@ -92,14 +93,14 @@ def bbox_conf(bboxes, confs, pos):
   Returns:
       A tuple containing the bounding box and confidence score at the specified position.
   """
-    bbox = bboxes[pos]
+    bbox  = bboxes[pos]
     conf = confs[pos]
     return bbox, conf
 
 # chack whether one array is a sub set of other array or not. return boolean value, min array, and maximum array
 def isSubset(yolo_class, rtmdet_class):
     """
-    This function checks if one list of class labels (`yolo_class` or `rtmdet_class`) 
+    This function checks if one list of class labels (yolo_class or rtmdet_class) 
     is a subset of the other. A subset means all elements in the smaller list 
     are also present in the larger list.
 
@@ -133,7 +134,7 @@ def isSubset(yolo_class, rtmdet_class):
 
 def checkArraysSimilarity(rtmdet_confs, yolo_confs, rtmdet_bboxes, yolo_bboxes, nonsorted_rtmdet_classes, nonsorted_yolo_classes, class_):
   """
-  This function iterates through a specified list of classes (`class_`) and checks for corresponding detections in both the RTMDet and YOLO model outputs. 
+  This function iterates through a specified list of classes (class_) and checks for corresponding detections in both the RTMDet and YOLO model outputs. 
   If a class is present in both models, it prioritizes the model with the higher confidence score for that class.
 
   Args:
@@ -173,10 +174,10 @@ def checkArraysSimilarity(rtmdet_confs, yolo_confs, rtmdet_bboxes, yolo_bboxes, 
 
 def confChecker(classes,bbox, confs, min_conf):
     """
-    This function filters detections based on a minimum confidence threshold (`min_conf`). 
-    It iterates through the provided confidence scores (`confs`) and checks if any value 
+    This function filters detections based on a minimum confidence threshold (min_conf). 
+    It iterates through the provided confidence scores (confs) and checks if any value 
     is greater than the threshold. If a high-confidence detection is found for a class 
-    in `class_`, it adds the corresponding bounding box and class label to the final results.
+    in class_, it adds the corresponding bounding box and class label to the final results.
 
     Args:
         class_ (list): List of class labels to consider.
@@ -212,18 +213,18 @@ def diffSizeArrays(rtmdet_bboxes, rtmdet_confs, yolo_bboxes, yolo_confs, nonsort
                    nonsorted_yolo_classes, yolo_classes, rtmdet_classes):
     """
     This function handles cases where the class lists from the RTMDet and YOLO models have different sizes. 
-    It first uses the `isSubset` function to determine if one list is a strict subset of the other. 
+    It first uses the isSubset function to determine if one list is a strict subset of the other. 
     Then, it applies different logic based on the following scenarios:
 
     1. Subset Relationship:
         - If one list is a subset, the function prioritizes detections for classes in the common set 
-          using `checkArraysSimilarity`.
-        - For classes that are unique to the larger list (superset), it uses `confChecker` 
+          using checkArraysSimilarity.
+        - For classes that are unique to the larger list (superset), it uses confChecker 
           to consider detections with confidence above a threshold.
 
     2. No Subset Relationship:
-        - If neither list is a subset of the other, the function uses `confChecker` independently 
-          on both `rtmdet_classes` and `yolo_classes` to consider high-confidence detections from each model.
+        - If neither list is a subset of the other, the function uses confChecker independently 
+          on both rtmdet_classes and yolo_classes to consider high-confidence detections from each model.
 
     Args:
         rtmdet_bboxes (list): List of bounding boxes from the RTMDet model.
@@ -273,10 +274,10 @@ def vote(predictions_rtmdet, predictions_yolo):
 
   1. Same Class Lists (Equal Length):
       - If the class lists from both models are identical and sorted, the function prioritizes 
-        detections with higher confidence scores using `checkArraysSimilarity`.
+        detections with higher confidence scores using checkArraysSimilarity.
 
   2. Different Class Lists:
-      - If the class lists have different sizes or elements, the function employs the `diffSizeArrays` 
+      - If the class lists have different sizes or elements, the function employs the diffSizeArrays 
         function to handle various scenarios:
           - Subset Relationship: Prioritizes detections for common classes and considers high-confidence 
             detections for unique classes in the larger list.
@@ -289,18 +290,18 @@ def vote(predictions_rtmdet, predictions_yolo):
   Returns:
       tuple: A tuple containing the final bounding boxes, confidence scores, and class labels after combining predictions.
   """
+   # Unpack predictions from both models
   final_boxes.clear()
   final_classes.clear()
   final_confidences.clear()
-   # Unpack predictions from both models
   rtmdet_bboxes, rtmdet_confs, rtmdet_classes = predictions_rtmdet
   yolo_bboxes, yolo_confs, yolo_classes = predictions_yolo
   # Convert class labels to lists (in case they were NumPy arrays)
   rtmdet_classes = list(rtmdet_classes)
   # Check if the class lists from both models are identical and sorted
   if len(rtmdet_classes)==len(yolo_classes):
-      nonsorted_yolo_classes = yolo_classes
-      nonsorted_rtmdet_classes = rtmdet_classes
+      nonsorted_yolo_classes =  yolo_classes
+      nonsorted_rtmdet_classes =  rtmdet_classes
       rtmdet_classes.sort()
       yolo_classes.sort()
       if yolo_classes == rtmdet_classes:
@@ -317,7 +318,7 @@ def vote(predictions_rtmdet, predictions_yolo):
                                       nonsorted_yolo_classes=nonsorted_yolo_classes, class_=com_rtmdet_class_)
 
                # for non common values checking confidence. If confident score greater than 0.8 then accept it as a correct answer 
-                uniq_yolo_classes = [x for x in nonsorted_yolo_classes if x not in nonsorted_rtmdet_classes]
+                uniq_yolo_classes =  [x for x in nonsorted_yolo_classes if x not in nonsorted_rtmdet_classes]
                 uniq_rtmdet_classes = [x for x in nonsorted_rtmdet_classes if x not in nonsorted_yolo_classes]
                 confChecker(classes=uniq_rtmdet_classes, min_conf=0.8, confs=rtmdet_confs, bbox=rtmdet_bboxes)
                 confChecker(classes=uniq_yolo_classes, min_conf=0.8, confs=yolo_confs, bbox=yolo_bboxes)
@@ -326,8 +327,8 @@ def vote(predictions_rtmdet, predictions_yolo):
                                nonsorted_rtmdet_classes=nonsorted_rtmdet_classes, 
                    nonsorted_yolo_classes=nonsorted_yolo_classes, yolo_classes=yolo_classes, rtmdet_classes=rtmdet_classes)
   else:
-        nonsorted_yolo_classes = yolo_classes
-        nonsorted_rtmdet_classes = rtmdet_classes
+        nonsorted_yolo_classes =  yolo_classes
+        nonsorted_rtmdet_classes =  rtmdet_classes
         diffSizeArrays(rtmdet_bboxes=rtmdet_bboxes, rtmdet_confs=rtmdet_confs, yolo_bboxes=yolo_bboxes, yolo_confs=yolo_confs, 
                                nonsorted_rtmdet_classes=nonsorted_rtmdet_classes, 
                    nonsorted_yolo_classes=nonsorted_yolo_classes, yolo_classes=yolo_classes, rtmdet_classes=rtmdet_classes)
@@ -365,20 +366,24 @@ def displayHybridPrediction(final_boxes, final_confidences, final_classes, IMAGE
            class_ = "rov"
            # Add confidence text at the top of each bounding box
            rect = patches.Rectangle((x_min, y_min), width, height, linewidth=2, edgecolor='b', facecolor='none')
-           ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='b', fontsize=10, ha='left', va='center',bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
+           ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='b', fontsize=10, ha='left', va='center', bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
         elif class_ == 2.0:
            class_ = "trash"
            # Add confidence text at the top of each bounding box
            rect = patches.Rectangle((x_min, y_min), width, height, linewidth=2, edgecolor='r', facecolor='none')
-           ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='r', fontsize=10, ha='left', va='center',bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
+           ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='r', fontsize=10, ha='left', va='center', bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
         # Add the patch to the plot
         ax.add_patch(rect)
     # Save the modified image with bounding boxes and confidence scores
-    plt.savefig(f"hybrid_model_detection/output_image_{count}.jpg", bbox_inches='tight')
-    return f"hybrid_model_detection/output_image_{count}.jpg"
-count+=1
-# for i in range (1,3):
-#     IMAGE_PATH = f"{dataset_location}/internet_{i}.jpg"
+    current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    output_filename = f"hybrid_model_detection/output_image_{current_time}.jpg"
+
+    # Save the modified image with bounding boxes and confidence scores
+    plt.savefig(output_filename, bbox_inches='tight')
+    return output_filename
+
+# for i in range (1,100):
+#     IMAGE_PATH = f"{dataset_location}/test/images/{i}.jpg"
 #     image = cv2.imread(IMAGE_PATH)
 #     result = inference_detector(model_rtmdet, image)
 #     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -386,8 +391,6 @@ count+=1
 #         predictions_rtmdet = rtmdet_thread.result() 
 #         yolo_thread = executor.submit(get_predictions, model_yolo, IMAGE_PATH)
 #         predictions_yolo = yolo_thread.result()
-#     # print(f"predictions_rtmdet: {predictions_rtmdet}")   
-#     # print(f"predictions_yolo: {predictions_yolo}")     
 #     # Placeholder variables for final predictions    
 #     final_boxes = []
 #     final_confidences = []
