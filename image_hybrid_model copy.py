@@ -130,63 +130,6 @@ for label_file in label_files:
 # Print or analyze confusion matrices as needed
 for label_file, conf_matrix in conf_matrices.items():
     print("Confusion Matrix for", label_file, ":\n", conf_matrix)
-# def displayHybridPrediction(predictions_rtmdet, predictions_yolo, IMAGE_PATH):
-#     """
-#     Visualizes final predictions on the image.
-#     Includes bounding boxes, confidence scores, and class labels.
-#     Saves the visualized image to a file.
-#     """
-#     ensemble_prediction = ensemble_predictions(predictions_rtmdet, predictions_yolo)
-#     print(ensemble_prediction)  # Check ensemble predictions
-#     image = cv2.imread(IMAGE_PATH)  # Read the image using OpenCV
-#     # Create a Matplotlib figure and axis
-#     fig, ax = plt.subplots(figsize=(image.shape[1] / 100, image.shape[0] / 100))  # Set figure size based on image size
-#     # Display the image without axis
-#     ax.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))  # Convert BGR to RGB for Matplotlib
-#     ax.axis('off')  # Turn off axis
-#     # Iterate over the final_boxes, final_confidences, and final_classes
-#     for box, confidence, class_ in zip(*ensemble_prediction):
-#         # box format: [x_min, y_min, x_max, y_max]
-#         x_min, y_min, x_max, y_max = box
-#         width = x_max - x_min
-#         height = y_max - y_min
-#         # Create a rectangle patch
-#         if class_ == 0.0:
-#             class_ = "bio"
-#              # Add confidence text at the top of each bounding box
-#             rect = patches.Rectangle((x_min, y_min), width, height, linewidth=2, edgecolor='g', facecolor='none')
-#             ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='g', fontsize=10, ha='left', va='center',bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
-#         elif class_ == 1.0:
-#             class_ = "rov"
-#             # Add confidence text at the top of each bounding box
-#             rect = patches.Rectangle((x_min, y_min), width, height, linewidth=2, edgecolor='b', facecolor='none')
-#             ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='b', fontsize=10, ha='left', va='center', bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
-#         elif class_ == 2.0:
-#             class_ = "trash"
-#             # Add confidence text at the top of each bounding box
-#             rect = patches.Rectangle((x_min, y_min), width, height, linewidth=2, edgecolor='r', facecolor='none')
-#             ax.text(x_min, y_min - 10, f'{class_}:{confidence:.2f}', color='r', fontsize=10, ha='left', va='center', bbox=dict(facecolor='white', alpha=0.7, edgecolor='white'))
-#         # Add the patch to the plot
-#         ax.add_patch(rect)
-#     # Save the modified image with bounding boxes and confidence scores
-#     current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-#     output_filename = f"hybrid_model_detection/output_image_{current_time}.jpg"
-#     # Save the modified image with bounding boxes and confidence scores
-#     plt.savefig(output_filename, bbox_inches='tight')
-#     return output_filename
-
-# for i in range (1,100):
-#     IMAGE_PATH = f"{dataset_location}/test/images/{i}.jpg"
-#     image = cv2.imread(IMAGE_PATH)
-#     result = inference_detector(model_rtmdet, image)
-#     with concurrent.futures.ThreadPoolExecutor() as executor:
-#         rtmdet_thread = executor.submit(get_predictions, model_rtmdet, IMAGE_PATH)
-#         predictions_rtmdet = rtmdet_thread.result() 
-#         yolo_thread = executor.submit(get_predictions, model_yolo, IMAGE_PATH)
-#         predictions_yolo = yolo_thread.result()
-#     # Placeholder variables for final predictions
-#     final_boxes, final_confidences, final_classes = displayHybridPrediction(predictions_rtmdet, predictions_yolo, IMAGE_PATH=IMAGE_PATH)
-#     count +=1
 
 # References:
 # Solovyev, R., Wang, W. and Gabruseva, T. (2021). Weighted boxes fusion: Ensembling boxes from different object detection models. Available from https://github.com/ZFTurbo/Weighted-Boxes-Fusion.
